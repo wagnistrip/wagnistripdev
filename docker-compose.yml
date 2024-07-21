@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  wagnistripdev:
+    image: wagnistripdev
+    build:
+      context: .
+      dockerfile: ./Dockerfile
