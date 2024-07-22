@@ -45,6 +45,7 @@ class SearchFlightController extends Controller
 
     public function searchFlight(Request $request)
     {
+
         $currency = $this->getvisitorcountrycurrency();
         try {
             $accessToken = $this->amadeusAccessToken->getAccessToken();
@@ -69,7 +70,8 @@ class SearchFlightController extends Controller
         $fareType = $request->get('fare', '');
         $travelClass = strtoupper($request->input('cabinClass'));
         $trip = $this->getTripType($origin, $destination); // Simplified logic for trip type
-        $tripType = $this->tripType($request['trip_type']); // Simplified logic for trip type
+        // $tripType = $this->tripType($request['trip_type']); // Simplified logic for trip type
+        $tripType = 1; // Simplified logic for trip type
         $travelClassMap = ['Y' => 'ECONOMY', 'W' => 'PREMIUM_ECONOMY', 'C' => 'BUSINESS', 'F' => 'FIRST'];
         $travelClass = isset($travelClassMap[$travelClass]) ? $travelClassMap[$travelClass] : null;
         if (!$travelClass) {
@@ -86,30 +88,126 @@ class SearchFlightController extends Controller
 
         if ($request['trip_type'] === "oneway") {
             $amadeusAvailability = $amadeusflightController->onewayFlight(
-                $trip, $departureDate, $origin, $destination, $adults, $includedAirlineCodes,
-                $children, $infants, $travelClass, $client, $headers, $fareType
+                $trip,
+                $departureDate,
+                $origin,
+                $destination,
+                $adults,
+                $includedAirlineCodes,
+                $children,
+                $infants,
+                $travelClass,
+                $client,
+                $headers,
+                $fareType
             );
             $galileoAvailability = $galileoflightController->Availability(
-                $trip, $tripType, $departureDate, $adults, $children, $infants,
-                $origin, $destination, ucfirst($travelClass)
+                $trip,
+                $tripType,
+                $departureDate,
+                $adults,
+                $children,
+                $infants,
+                $origin,
+                $destination,
+                ucfirst($travelClass)
             );
         } elseif ($request['trip_type'] === "roundtrip") {
-            $amadeusAvailability = $amadeusflightController->roundTripFlight(
-                $trip, $departureDate, $returnDate, $origin, $destination, $adults,
-                $includedAirlineCodes, $children, $infants, $travelClass, $client, $headers, $this->amadeusAccessToken
+
+            // $amadeusAvailability = $amadeusflightController->roundTripFlight(
+            //     $trip, $departureDate, $returnDate, $origin, $destination, $adults,
+            //     $includedAirlineCodes, $children, $infants, $travelClass, $client, $headers, $this->amadeusAccessToken
+            // );
+            // $galileoAvailability = $galileoflightController->AvailabilityRound(
+            //     $trip, $tripType, $departureDate, $returnDate, $adults, $children,
+            //     $infants, $origin, $destination, ucfirst($travelClass), $fareType
+            // );
+            $amadeusAvailabilitydeparture = $amadeusflightController->onewayFlight(
+                $trip,
+                $departureDate,
+                $origin,
+                $destination,
+                $adults,
+                $includedAirlineCodes,
+                $children,
+                $infants,
+                $travelClass,
+                $client,
+                $headers,
+                $fareType
             );
-            $galileoAvailability = $galileoflightController->AvailabilityRound(
-                $trip, $tripType, $departureDate, $returnDate, $adults, $children,
-                $infants, $origin, $destination, ucfirst($travelClass), $fareType
+            $amadeusAvailabilityarival = $amadeusflightController->onewayFlight(
+                $trip,
+                $returnDate,
+                $destination,
+                $origin,
+                $adults,
+                $includedAirlineCodes,
+                $children,
+                $infants,
+                $travelClass,
+                $client,
+                $headers,
+                $fareType
             );
+            $galileoAvailabilitydeparture = $galileoflightController->Availability(
+                $trip,
+                $tripType,
+                $departureDate,
+                $adults,
+                $children,
+                $infants,
+                $origin,
+                $destination,
+                ucfirst($travelClass)
+            );
+            $galileoAvailabilityarival = $galileoflightController->Availability(
+                $trip,
+                $tripType,
+                $returnDate,
+                $adults,
+                $children,
+                $infants,
+                $destination,
+                $origin,
+                ucfirst($travelClass)
+            );
+
+            $galileoAvailability = [
+                'gal_departure' => $galileoAvailabilitydeparture,
+                'gal_arrival' => $galileoAvailabilityarival,
+            ];
+            $amadeusAvailability = [
+                'amadeus_departure' => $amadeusAvailabilitydeparture,
+                'amadeus_arrival' => $amadeusAvailabilityarival,
+            ];
         } elseif ($request['trip_type'] === "multicity") {
             $amadeusAvailability = $amadeusflightController->multyCityTripFlight(
-                $trip, $departureDate, $returnDate, $origin, $destination, $adults,
-                $includedAirlineCodes, $children, $infants, $travelClass, $client, $headers
+                $trip,
+                $departureDate,
+                $returnDate,
+                $origin,
+                $destination,
+                $adults,
+                $includedAirlineCodes,
+                $children,
+                $infants,
+                $travelClass,
+                $client,
+                $headers
             );
             $galileoAvailability = $galileoflightController->AvailabilityMultiCity(
-                $trip, $tripType, $departureDate, $returnDate, $adults, $children,
-                $infants, $origin, $destination, ucfirst($travelClass), $fareType
+                $trip,
+                $tripType,
+                $departureDate,
+                $returnDate,
+                $adults,
+                $children,
+                $infants,
+                $origin,
+                $destination,
+                ucfirst($travelClass),
+                $fareType
             );
         } else {
             return response()->json(['error' => 'Invalid trip type provided.'], 400);
@@ -127,7 +225,4 @@ class SearchFlightController extends Controller
 
         return response()->json($availabilityResults);
     }
-
-
-
 }
