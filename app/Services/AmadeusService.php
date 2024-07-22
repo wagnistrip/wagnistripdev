@@ -31,7 +31,6 @@ class AmadeusService
             $this->fetchAccessToken();
         }
         return $this->accessToken;
-      
     }
 
     private function fetchAccessToken(): void
@@ -44,11 +43,9 @@ class AmadeusService
                     'client_secret' => $this->clientSecret,
                 ],
             ]);
-
             if ($response->getStatusCode() !== 200) {
                 throw new Exception('Failed to retrieve access token: ' . $response->getBody());
             }
-
             $data = json_decode($response->getBody(), true);
             $this->accessToken = $data['access_token'];
             $this->accessTokenExpiry = time() + $data['expires_in'];
@@ -65,10 +62,8 @@ class AmadeusService
     {
         try {
             $response = $this->client->request($method, $endpoint, $options);
-
             // Log request and response
             $this->logAmadeusRequest($method, $endpoint, $options, $response, 'request_success');
-
             return $response;
         } catch (RequestException $e) {
             // Log error if request fails

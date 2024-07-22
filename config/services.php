@@ -50,6 +50,11 @@ return [
         'user_name' => env('GALILEO_USER_NAME' , 'MakeTrueTrip'),
         'password' => env('GALILEO_PASSWORD' , '$W-4tQ(&@22'),
     ],
+    'easebuzz' => [
+        'api_key'=>env('EASEBUZZ_API_KEY' , '#apikey'),
+        'api_secret' =>env('EASEBUZZ_API_SECRET' , '#api_secret'),
+        'merchant_id' => env('EASEBUZZ_MERCHANT_ID' , '#merchantID')
+    ],
     'cashfree' => [
         'key' => env('CASHFREE_APP_ID' , '1661862c982a09f6d5f1d93900681661'),
         'secret' => env('CASHFREE_SECRET_KEY' , '781827d26290a6ea98559e65ec895029923b5fa7'),

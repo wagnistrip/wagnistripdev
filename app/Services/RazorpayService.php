@@ -16,7 +16,6 @@ class RazorpayService
 
     public function createPaymentLink($amount, $currency = 'INR', $upi_id)
     {
-
         $paymentLinkData = [
             'type' => 'link',
             'amount' => $amount * 100, // Amount in paisa

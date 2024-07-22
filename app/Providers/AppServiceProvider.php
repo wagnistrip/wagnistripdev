@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\AmadeusService;
 use App\Services\GalileoService;
+use App\Services\EasebuzzService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,13 @@ class AppServiceProvider extends ServiceProvider
             return new GalileoService(
                 config('services.galileo.user_name'),
                 config('services.galileo.password'),
+            );
+        });
+        $this->app->singleton(EasebuzzService::class, function ($app) {
+            return new EasebuzzService(
+                config('services.easebuzz.api_key'),
+                config('services.easebuzz.api_secret'),
+                config('services.easebuzz.merchant_id')
             );
         });
     }
