@@ -26,7 +26,7 @@ class AmadeusSearchFlightController extends Controller
                     "currencyCode" => $this->getCountryCode(),
                     "travelClass" => $travelClass,
                     // Optional parameters (comment out if not needed)
-                    "max" => 20,
+                    "max" => 10,
                     // "nonStop" => false,
                     // "excludedAirlineCodes" => ...,
                     // "maxPrice" => ...,
