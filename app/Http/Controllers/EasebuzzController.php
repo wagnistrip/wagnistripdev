@@ -23,7 +23,7 @@ class EasebuzzController extends Controller
         $customerName = urlencode($request->customer_name);
         $note = urlencode('Flight Booking');
         $transactionId = uniqid();
-        $apiUrl = env('EASEBUZZ_API_URL') . 'https://testpay.easebuzz.in/payment/initiateLink'; 
+        $apiUrl = env('EASEBUZZ_API_URL') . '/payment/initiateLink'; 
         $response = Http::post($apiUrl, [
             'api_key' => env('EASEBUZZ_API_KEY'),
             'api_secret' => env('EASEBUZZ_API_SECRET'),
