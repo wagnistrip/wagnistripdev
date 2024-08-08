@@ -225,4 +225,5 @@ class SearchFlightController extends Controller
 
         return response()->json($availabilityResults);
     }
+    
 }

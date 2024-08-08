@@ -5,88 +5,73 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use App\Services\Easebuzz\EasebuzzService;
 
 class EasebuzzController extends Controller
 {
-    public function processPayment(Request $request)
+    protected $easebuzzService;
+
+    public function __construct(EasebuzzService $easebuzzService)
     {
-        $request->validate([
-            'upi_id' => 'required|string',
-            'amount' => 'required|numeric',
-            'customer_name' => 'required|string',
-            'customer_email' => 'required|email',
-            'customer_phone' => 'required|string',
+        $this->easebuzzService = $easebuzzService;
+    }
+
+    public function initiatePayment(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'amount' => 'required|numeric',
+        'productinfo' => 'required',
+        'firstname' => 'required',
+        'email' => 'required|email',
+        'phone' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation errors',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $txnid = 'txn_' . Str::random(10);
+    $data = $request->all();
+    $data['txnid'] = $txnid;
+
+    $response = $this->easebuzzService->initiatePayment($data);
+
+    if ($response['status'] == 1) {
+        $redirectUrl = $this->easebuzzService->getPaymentRedirectUrl($response['data']);
+        return response()->json([
+            'success' => true,
+            'redirect_url' => $redirectUrl
         ]);
-    
-        $upiId = $request->upi_id;
-        $amount = $request->amount;
-        $customerName = urlencode($request->customer_name);
-        $note = urlencode('Flight Booking');
-        $transactionId = uniqid();
-        $apiUrl = env('EASEBUZZ_API_URL') . '/payment/initiateLink'; 
-        $response = Http::post($apiUrl, [
-            'api_key' => env('EASEBUZZ_API_KEY'),
-            'api_secret' => env('EASEBUZZ_API_SECRET'),
-            'txnid' => $transactionId,
-            'amount' => $amount,
-            'firstname' => $customerName,
-            'email' => $request->customer_email,
-            'phone' => $request->customer_phone,
-            'productinfo' => 'Flight Booking',
-            'surl' => route('payment.success'),
-            'furl' => route('payment.failure'),
-            'udf1' => $upiId,
-            'service_provider' => 'payu_paisa'
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Payment initiation failed',
+            'data' => $response
         ]);
-    
-        $rawResponse = $response->body();
-        Log::info('Raw Payment API response', ['response' => $rawResponse]);
-    
-        $responseBody = $response->json();
-        Log::info('Parsed Payment API response', ['response' => $responseBody]);
-    
-        if ($response->successful()) {
-            return response()->json([
-                'success' => true,
-                'data' => $responseBody,
-                'message' => 'Payment successful'
-            ]);
-        } else {
-            Log::error('Payment initiation failed', ['response' => $responseBody]);
-            return response()->json([
-                'success' => false,
-                'error' => 'Payment initiation failed',
-                'data' => $responseBody
-            ], 500);
-        }
     }
+}
+
     
-    
-    private function sendSms($phone, $message)
+    public function success()
     {
-        // Here you can integrate any SMS gateway to send the message
-        // Example using Twilio:
-        // Http::post('https://api.twilio.com/2010-04-01/Accounts/your_account_sid/Messages.json', [
-        //     'From' => 'your_twilio_number',
-        //     'To' => $phone,
-        //     'Body' => $message,
-        // ]);
-
-        // Log the message for now
-        Log::info("SMS sent to $phone with message: $message");
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Payment was successful'
+        ]);
     }
-
-    public function paymentSuccess(Request $request)
+    
+    public function failure()
     {
-        // Handle the success response here
-        return response()->json(['message' => 'Payment successful']);
+        return response()->json([
+            'status' => 'failure',
+            'message' => 'Payment failed'
+        ]);
     }
-
-    public function paymentFailure(Request $request)
-    {
-        // Handle the failure response here
-        return response()->json(['message' => 'Payment failed']);
-    }
-
     
 }
