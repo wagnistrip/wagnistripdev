@@ -65,6 +65,9 @@ return [
     'razorpay' => [
         'key' => env('RAZORPAY_KEY','rzp_test_VruMADPs1DBV6o'),
         'secret'=>env('RAZORPAY_SECRET','ADrftEFq6AhVZZ4te00pK6qK')
-    ]
+    ],
+    'easebuzz' => [
+    'salt' => env('EASEBUZZ_SALT'),
+]
 
 ];

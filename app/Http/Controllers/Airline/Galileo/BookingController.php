@@ -31,31 +31,30 @@ class BookingController extends Controller
     
             // if (isset($response['AirBookingResponse']) && !empty($response['AirBookingResponse'])) {
             //     $airBookingResponse = $response['AirBookingResponse'][0];
-    
+            
             //     $data["title"] = "From wagnistrip.com";
             //     $data["body"] = $airBookingResponse['PNR'] ?? 'N/A';
             //     $data["departure"] = $airBookingResponse['FlightDetails'][0]['DepartAirportCode'] ?? 'N/A';
             //     $data["arrival"] = $airBookingResponse['FlightDetails'][0]['ArrivalAirportCode'] ?? 'N/A';
             //     $data['name'] = $airBookingResponse['CustomerInfo']['PassengerDetails'][0]['FirstName'] ?? 'N/A';
-    
+            
             //     $pdf = PDF::loadView('emails.myTestMail', $data);
-    
+            
             //     $recipientEmail = $request->input('Email', 'sona.ansari786000@gmail.com');
-            //     $recipients = ["customercare@wagnistrip.com", "developer@wagnistrip.com", $recipientEmail];
-    
+            //     $recipients = ["customercare@wagnistrip.com", $recipientEmail];
+            
             //     Mail::send('emails.myTestMail', $data, function ($message) use ($data, $pdf, $recipients) {
+            //         $message->from('customercare@wagnistrip.com', 'Wagnistrip Customer Care');
             //         $message->to($recipients)
             //             ->subject($data["title"])
             //             ->attachData($pdf->output(), $data['name'] . ".pdf");
             //     });
-    
-               
+            
             //     Log::info('Email sent to:', $recipients);
             // } else {
-              
             //     Log::warning('AirBookingResponse not present or empty in response:', $response);
             // }
-    
+          
             return response()->json($response);
         } catch (\Exception $e) {
            

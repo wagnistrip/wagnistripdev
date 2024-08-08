@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Payment\{RazorpayPaymentController, CartController};
 use App\Http\Controllers\EasebuzzController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,6 +25,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 // --------------- Flight Location Search --------------- //
+
+Route::post('request-otp', [AuthController::class, 'requestOtp']);
+Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::get('/phonecode', [HelperController::class, 'phonecode']);
 Route::get('/airlinecodes', [AirPortIATACodesController::class, 'searchAirIataCode']);
@@ -116,13 +121,12 @@ Route::get('search-hotel-by-keyword', [SearchHotelController::class, 'searchHote
 Route::post('hotel-booking', [HotelBookingController::class, 'HotelBookingCode']);
 Route::post('create-hotel-order', [HotelBookingController::class, 'CreateHotelOrder']);
 
+// //payment
 
-
-//payment
-Route::post('booking/process-payment', [EasebuzzController::class, 'processPayment']);
-Route::get('payment/success', [EasebuzzController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('payment/failure', [EasebuzzController::class, 'paymentFailure'])->name('payment.failure');
-
+Route::post('/payment/initiate', [EasebuzzController::class, 'initiatePayment']);
+Route::post('/payment/response', [EasebuzzController::class, 'paymentResponse'])->name('payment.response');
+Route::get('/payment/success', [EasebuzzController::class, 'success'])->name('payment.success');
+Route::get('/payment/failure', [EasebuzzController::class, 'failure'])->name('payment.failure');
 
 require __DIR__ . '/galileo.php';
 require __DIR__ . '/amadeus.php';

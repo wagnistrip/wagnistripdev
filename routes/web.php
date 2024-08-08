@@ -20,6 +20,15 @@ Route::get('/', function () {
 });
 
 
+// Route::get('/success', function () {
+//     return response()->json(['message' => 'Payment was successful!']);
+// })->name('payment.success');
+
+// Route::get('/failure', function () {
+//     return response()->json(['message' => 'Payment failed!']);
+// })->name('payment.failure');
+
+
 // Route::get('flight/search' , [SearchFlightController::class , 'searchFlight']);
 
 require __DIR__.'/auth.php';
